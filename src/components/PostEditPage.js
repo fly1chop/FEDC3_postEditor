@@ -50,8 +50,22 @@ export default function PostEditPage({ $target, initialState,  }) {
   this.setState = async (nextState) => {
     if(this.state.postId !== nextState.postId){
       postLocalSaveKey = `temp-post-${nextState.postId}`
+      
       this.state = nextState;
-      await fetchPost();
+
+      if(this.state.postId === 'new'){
+        const post = getItem(postLocalSaveKey, {
+          title: '',
+          content: '',
+        });
+
+        this.render()
+        editor.setState(post)
+
+      } else {
+        await fetchPost();
+      }
+
       return
     }
     
