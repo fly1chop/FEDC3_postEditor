@@ -2,6 +2,7 @@ import { getItem, removeItem, setItem } from "./localStorage.js"
 import { debounce } from "./util.js";
 import Editor from "./Editor.js";
 import { request } from "./api.js";
+import { push } from "./router.js";
 
 export default function PostEditPage({ $target, initialState,  }) {
   const $page = document.createElement('div');
@@ -86,15 +87,6 @@ export default function PostEditPage({ $target, initialState,  }) {
           })
           return
         } 
-        
-        /*else {
-          removeItem(postLocalSaveKey);
-          this.setState({
-            ...this.state,
-            post
-          })
-          return
-        }*/
       }
 
       this.setState({
@@ -103,4 +95,12 @@ export default function PostEditPage({ $target, initialState,  }) {
       })
     }
   }
+
+  const $moveListButton = document.createElement('button')
+  $moveListButton.innerHTML = 'Back to list'
+  $page.appendChild($moveListButton)
+
+  $moveListButton.addEventListener('click', () => {
+    push('/')
+  })
 }
