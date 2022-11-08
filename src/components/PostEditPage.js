@@ -1,5 +1,4 @@
-import { getItem, setItem } from "./localStorage.js"
-import { TEMP_POST_SAVE_KEY } from "./constants.js";
+import { getItem, removeItem, setItem } from "./localStorage.js"
 import { debounce } from "./util.js";
 import Editor from "./Editor.js";
 import { request } from "./api.js";
@@ -9,16 +8,18 @@ export default function PostEditPage({ $target, initialState }) {
 
   this.state = initialState
 
-  const post = getItem(`${TEMP_POST_SAVE_KEY}-${this.state.postId}`, {
-    title: "",
-    content: "",
+  let postLocalSaveKey = `temp-post-${this.state.postId}`
+
+  const post = getItem(postLocalSaveKey, {
+    title: '',
+    content: '',
   });
   
   const editor = new Editor({
     $target: $page,
     initialState: post,
     onEditing: debounce((post) => {
-      setItem(`${TEMP_POST_SAVE_KEY}-${this.state.postId}`, {
+      setItem(postLocalSaveKey, {
         ...post,
         tempSaveDate: new Date(),
       });
@@ -27,6 +28,7 @@ export default function PostEditPage({ $target, initialState }) {
 
   this.setState = async (nextState) => {
     if(this.state.postId !== nextState.postId){
+      postLocalSaveKey = `temp-post-${nextState.postId}`
       this.state = nextState;
       await fetchPost();
       return
@@ -34,8 +36,11 @@ export default function PostEditPage({ $target, initialState }) {
     
     this.state = nextState;
     this.render();
-
-    editor.setState(this.state.post)
+ 
+    editor.setState(this.state.post || {
+      title: '',
+      content: ''
+    })
   }
 
   this.render = () => {
@@ -48,6 +53,28 @@ export default function PostEditPage({ $target, initialState }) {
 
     if(this.state !== 'new'){
       const post = await request(`/posts/${postId}`)
+
+      const tempPost = getItem(postLocalSaveKey, {
+        title: '',
+        content: '',
+      });
+
+      if(tempPost.tempSaveDate && tempPost.tempSaveDate > post.updated_at) {
+        if(confirm('Unsaved work found; would you like to retrieve?')){
+          this.setState({
+            ...this.state,
+            post: tempPost
+          })
+          return
+        } else {
+          removeItem(postLocalSaveKey);
+          this.setState({
+            ...this.state,
+            post
+          })
+          return
+        }
+      }
 
       this.setState({
         ...this.state,

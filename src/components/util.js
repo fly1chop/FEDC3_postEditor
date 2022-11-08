@@ -1,8 +1,11 @@
 export const debounce = (func, timeout = 500) => {
-  let timerId;
+  let timerId = null;
 
   return (...args) => {
-    clearTimeout(timerId);
+    if(timerId !== null){
+      clearTimeout(timerId);
+    }
+
     timerId = setTimeout(() => func(...args), timeout)
   };
 }

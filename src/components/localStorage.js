@@ -19,3 +19,7 @@ export const getItem = (key, defaultValue) => {
     return defaultValue
   }
 }
+
+export const removeItem = (key) => {
+  storage.removeItem(key);
+}
