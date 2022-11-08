@@ -1,5 +1,6 @@
 import PostsPage from "./components/PostsPage.js";
 import PostEditPage from "./components/PostEditPage.js";
+import { initRouter } from "./components/router.js";
 
 // url 규칙
 // root: postPage 그리기
@@ -37,12 +38,5 @@ export default function App({ $target }) {
 
   this.route();
 
-  window.addEventListener('route-change', (e) => {
-    const { nextURL } = e.detail
-
-    if(!nextURL) return;
-    
-    history.pushState(null, null, nextURL)
-    this.route()
-  })
+  initRouter(() => this.route());
 }
