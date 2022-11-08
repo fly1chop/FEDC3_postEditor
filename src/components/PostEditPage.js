@@ -3,7 +3,7 @@ import { debounce } from "./util.js";
 import Editor from "./Editor.js";
 import { request } from "./api.js";
 
-export default function PostEditPage({ $target, initialState }) {
+export default function PostEditPage({ $target, initialState,  }) {
   const $page = document.createElement('div');
 
   this.state = initialState
@@ -18,11 +18,30 @@ export default function PostEditPage({ $target, initialState }) {
   const editor = new Editor({
     $target: $page,
     initialState: post,
-    onEditing: debounce((post) => {
+    onEditing: debounce(async (post) => {
       setItem(postLocalSaveKey, {
         ...post,
         tempSaveDate: new Date(),
       });
+
+      const isNew = this.state.postId === 'new'
+      if(isNew) {
+        const createdPost = await request('/posts', {
+          method: 'POST',
+          body: JSON.stringify(post)
+        })
+
+        history.replaceState(null, null, `/posts/${createdPost.id}`)
+        removeItem(postLocalSaveKey)
+
+      } else {
+        console.log('this is else')
+        await request(`/posts/${post.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(post)
+        })
+        removeItem(postLocalSaveKey)
+      }
     }, 1000),
   });
 
@@ -66,14 +85,16 @@ export default function PostEditPage({ $target, initialState }) {
             post: tempPost
           })
           return
-        } else {
+        } 
+        
+        /*else {
           removeItem(postLocalSaveKey);
           this.setState({
             ...this.state,
             post
           })
           return
-        }
+        }*/
       }
 
       this.setState({
