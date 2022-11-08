@@ -3,6 +3,7 @@ import { debounce } from "./util.js";
 import Editor from "./Editor.js";
 import { request } from "./api.js";
 import { push } from "./router.js";
+import LinkButton from "./linkButton.js";
 
 export default function PostEditPage({ $target, initialState,  }) {
   const $page = document.createElement('div');
@@ -96,11 +97,11 @@ export default function PostEditPage({ $target, initialState,  }) {
     }
   }
 
-  const $moveListButton = document.createElement('button')
-  $moveListButton.innerHTML = 'Back to list'
-  $page.appendChild($moveListButton)
-
-  $moveListButton.addEventListener('click', () => {
-    push('/')
+  new LinkButton({
+    $target: $page,
+    initialState: {
+      text: 'Back to list',
+      link: '/'
+    }
   })
 }
