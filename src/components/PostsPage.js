@@ -5,7 +5,7 @@ export default function PostsPage({ $target }) {
   const $page = document.createElement('div');
 
   const postList = new PostList({
-    $target,
+    $target: $page,
     initialState: []
   })
   

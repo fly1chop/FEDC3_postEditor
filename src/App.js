@@ -8,7 +8,10 @@ import PostEditPage from "./components/PostEditPage.js";
 // `/posts/new` - 새 post 생성
 
 export default function App({ $target }) {
-  const postsPage = new PostsPage({ $target });
+  const postsPage = new PostsPage({ 
+    $target
+  });
+
   const postEditPage = new PostEditPage({
     $target,
     initialState: {
@@ -21,6 +24,7 @@ export default function App({ $target }) {
   });
 
   this.route = () => {
+    $target.innerHTML = ``
     const { pathname } = window.location;
 
     if (pathname === "/") {
@@ -32,4 +36,13 @@ export default function App({ $target }) {
   };
 
   this.route();
+
+  window.addEventListener('route-change', (e) => {
+    const { nextURL } = e.detail
+
+    if(!nextURL) return;
+    
+    history.pushState(null, null, nextURL)
+    this.route()
+  })
 }
